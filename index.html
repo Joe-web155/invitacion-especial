@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta especial</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .envelope {
+            width: 300px;
+            height: 200px;
+            background-color: #f5d9d5;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .envelope:hover {
+            transform: scale(1.05);
+        }
+        .envelope:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #e8c0c0;
+            transition: transform 0.3s ease;
+            z-index: 2;
+        }
+        .envelope-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: bold;
+            color: #8e4c4c;
+            z-index: 3;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 300px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+        .card.open {
+            transform: translate(-50%, -50%) scale(1);
+            animation: cardOpen 1s ease;
+        }
+        @keyframes cardOpen {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1.2) rotate(5deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+        h1 {
+            color: #ff69b4;
+            animation: colorChange 5s infinite;
+        }
+        @keyframes colorChange {
+            0% { color: #ff69b4; }
+            25% { color: #ff1493; }
+            50% { color: #ff4500; }
+            75% { color: #ff6347; }
+            100% { color: #ff69b4; }
+        }
+        button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #ff1493;
+            transform: scale(1.1);
+        }
+        #result, #form {
+            margin-top: 20px;
+            font-weight: bold;
+            animation: fadeIn 1s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            transform: rotate(45deg);
+            animation: heartBeat 1s infinite;
+        }
+        .heart::before,
+        .heart::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            border-radius: 50%;
+            position: absolute;
+        }
+        .heart::before {
+            top: -10px;
+            left: 0;
+        }
+        .heart::after {
+            top: 0;
+            left: -10px;
+        }
+        @keyframes heartBeat {
+            0% { transform: rotate(45deg) scale(1); }
+            25% { transform: rotate(45deg) scale(1.1); }
+            50% { transform: rotate(45deg) scale(1); }
+            75% { transform: rotate(45deg) scale(1.1); }
+            100% { transform: rotate(45deg) scale(1); }
+        }
+        .star {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid gold;
+            animation: starTwinkle 2s infinite;
+        }
+        .star::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: -10px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid gold;
+        }
+        @keyframes starTwinkle {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="envelope" onclick="openEnvelope()">
+        <div class="envelope-text">Para Sharon y Hanna</div>
+    </div>
+    <div class="card" id="card">
+        <h1>Una invitación especial</h1>
+        <p>Hanna y Sharon, me encantaría saber si alguna de ustedes quisiera tener una cita conmigo.</p>
+        <button onclick="responder(true)">Sí</button>
+        <button onclick="responder(false)">No</button>
+        <div id="result"></div>
+        <div id="form"></div>
+    </div>
+
+    <script>
+        function openEnvelope() {
+            document.querySelector('.envelope').style.display = 'none';
+            document.getElementById('card').classList.add('open');
+            createAnimations();
+        }
+
+        function responder(aceptar) {
+            const resultadoElement = document.getElementById('result');
+            const formElement = document.getElementById('form');
+            
+            if (aceptar) {
+                resultadoElement.innerHTML = "¡Qué emoción! Me encantaría tener una cita contigo.";
+                formElement.innerHTML = `
+                    <h3>Detalles de la cita:</h3>
+                    <form onsubmit="confirmarCita(event)">
+                        <label for="fecha">Fecha:</label>
+                        <input type="date" id="fecha" required><br><br>
+                        <label for="hora">Hora:</label>
+                        <input type="time" id="hora" required><br><br>
+                        <label for="lugar">Lugar:</label>
+                        <input type="text" id="lugar" required><br><br>
+                        <button type="submit">Confirmar cita</button>
+                    </form>
+                `;
+            } else {
+                resultadoElement.innerHTML = "Entiendo. Gracias por tu honestidad. Espero que podamos seguir siendo amigos.";
+                formElement.innerHTML = '';
+            }
+        }
+
+        function confirmarCita(event) {
+            event.preventDefault();
+            const fecha = document.getElementById('fecha').value;
+            const hora = document.getElementById('hora').value;
+            const lugar = document.getElementById('lugar').value;
+            const resultadoElement = document.getElementById('result');
+            resultadoElement.innerHTML = `¡Genial! Nuestra cita está confirmada para el ${fecha} a las ${hora} en ${lugar}. ¡Estoy emocionado!`;
+            document.getElementById('form').innerHTML = '';
+        }
+
+        function createAnimations() {
+            for (let i = 0; i < 5; i++) {
+                createHeart();
+                createStar();
+            }
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.style.left = Math.random() * window.innerWidth + 'px';
+            heart.style.top = Math.random() * window.innerHeight + 'px';
+            document.body.appendChild(heart);
+        }
+
+        function createStar() {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.left = Math.random() * window.innerWidth + 'px';
+            star.style.top = Math.random() * window.innerHeight + 'px';
+            document.body.appendChild(star);
+        }
+    </script>
+</body>
+</html>
